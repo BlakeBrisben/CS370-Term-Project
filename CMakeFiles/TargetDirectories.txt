@@ -1,0 +1,3 @@
+/home/bjcbf/CS370-Term-Project/CMakeFiles/rebuild_cache.dir
+/home/bjcbf/CS370-Term-Project/CMakeFiles/edit_cache.dir
+/home/bjcbf/CS370-Term-Project/CMakeFiles/Record.dir
