@@ -22,18 +22,16 @@ int main() {
     int frameHeight = static_cast<int>(cap.get(4));
 
     Size frameSize(frameWidth, frameHeight);
-    int fps = 25;
     
-    output.open("~/proj_vids/test.mp4", VideoWriter::fourcc('m', 'p', '4', 'v'), fps, frameSize);
-    if(output.isOpened) {
+    output.open("vid/test.avi", VideoWriter::fourcc('M', 'P', '4', '2'), cap.get(5), frameSize);
+    if(output.isOpened()) {
         cout << "Im open" << endl;
     }
-
 
     while(true) {
         cap >> image;
 
-        output.write(image);
+        output << image;
         imshow("Display", image);
 
         int key = waitKey(25);
@@ -50,12 +48,13 @@ int main() {
 
     namedWindow("Check");
     
-    VideoCapture testVid("~/proj_vids/test.mp4");
+    VideoCapture testVid("vid/test.avi");
 
     if(!testVid.isOpened()) {
         cout << "Failed to open video file" << endl;
     } else {
         int fps = testVid.get(5);
+        cout << fps << endl;
         int frameCount = testVid.get(7);
 
         while(testVid.isOpened()) {
@@ -68,7 +67,7 @@ int main() {
                 break;
             }
             
-            int key = waitKey(25);
+            int key = waitKey(fps);
             if(key == 'q') {
                 cout << "Stopping video" << endl;
                 break;
