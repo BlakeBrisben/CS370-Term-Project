@@ -5,79 +5,60 @@
 using namespace cv;
 using namespace std;
 
-int main() {
+int record(string fileName) {
     Mat image;
-
-    namedWindow("Display");
 
     VideoCapture cap(0);
     VideoWriter output;
 
     if(!cap.isOpened()) {
-        cout << "unable to open camera" << endl;
         return 1;
     } 
 
     int frameWidth = static_cast<int>(cap.get(3));
     int frameHeight = static_cast<int>(cap.get(4));
+    int fps = cap.get(5);
 
     Size frameSize(frameWidth, frameHeight);
     
-    output.open("vid/test.avi", VideoWriter::fourcc('M', 'P', '4', '2'), cap.get(5), frameSize);
-    if(output.isOpened()) {
-        cout << "Im open" << endl;
+    output.open("vid/" + fileName, VideoWriter::fourcc('M', 'P', '4', '2'), cap.get(5), frameSize);
+    if(!output.isOpened()) {
+        return 2;
     }
 
-    while(true) {
+    for(int i = 0; i < fps * 10; i++) {
         cap >> image;
 
         output << image;
-        imshow("Display", image);
 
-        int key = waitKey(25);
-        if(key == 'q') {
-            cout << "stopping video recording" << endl;
-            break;
+        if(i % fps == 0) {
+            cout << "Time elapsed(" << fileName << "): " << i / fps << endl;
         }
+
     }
 
     cap.release();
     output.release();
 
-    Mat replay;
+    return 0;
+}
 
-    namedWindow("Check");
-    
-    VideoCapture testVid("vid/test.avi");
+int main(int argc, char* argv[]) {
 
-    if(!testVid.isOpened()) {
-        cout << "Failed to open video file" << endl;
-    } else {
-        int fps = testVid.get(5);
-        cout << fps << endl;
-        int frameCount = testVid.get(7);
-
-        while(testVid.isOpened()) {
-            bool isFrame = testVid.read(replay);
-
-            if(isFrame) {
-                imshow("Check", replay);
-            } else {
-                cout << "No frame\n";
-                break;
-            }
-            
-            int key = waitKey(fps);
-            if(key == 'q') {
-                cout << "Stopping video" << endl;
-                break;
-            }
-        }
+    if(argc != 2) {
+        cout << "File name needs to be specified. Usage: \n\t./Record <filename.extension>\n";
+        return EXIT_FAILURE;
     }
 
-    testVid.release();
-    destroyAllWindows();
-
+    string fileName = argv[1];
+    int ret = record(fileName);
+    if(ret == 1) {
+        cout << "Camera was not opened successfully\n";
+        return EXIT_FAILURE;
+    } else if(ret == 2) {
+        cout << "Output file was unable to be opened: " << fileName << endl;
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }
