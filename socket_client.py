@@ -5,11 +5,19 @@ import sys
 import pickle
 import struct
 
-cap = cv2.VideoCapture("vid/vid0.avi")
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientsocket.connect(('127.0.0.1', 8083))
+clientsocket.connect(('10.0.0.36', 8083))
 
-while True:
-    ret,frame = cap.read()
-    data = pickle.dumps(frame)
-    clientsocket.sendall(struct.pack("L", len(data)) + data)
+fileName = sys.argv[1]
+
+file = open('vid/' + fileName, 'rb')
+print(f'Sending: {fileName}')
+
+data = file.read(4096)
+
+while(data):
+    clientsocket.send(data)
+    data = file.read(4096)
+
+file.close()
+clientsocket.close()
