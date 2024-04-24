@@ -1,3 +1,4 @@
+from datetime import datetime
 import socket
 import sys
 import cv2
@@ -17,25 +18,23 @@ print('Socket bind complete')
 s.listen(10)
 print('Socket now listening')
 
-conn, addr = s.accept()
+now = datetime.now()
+fileName = 'vid' + now.strftime('%m%d%H:%M')
+
+file = open(fileName, 'w')
+
 
 data = b''
 payload_size = struct.calcsize("L")
 
 while True:
-    while len(data) < payload_size:
-        data += conn.recv(4096)
-    packed_msg_size = data[:payload_size]
+    conn, addr = s.accept()
+    data = conn.recv(4096)
+    
+    while(data):
+        file.write(data)
+        data = conn.recv(4096)
 
-    data = data[payload_size:]
-    msg_size = struct.unpack("L", packed_msg_size)[0]
-
-    while len(data) < msg_size:
-        data += conn.recv(4096)
-    frame_data = data[:msg_size]
-    data = data[msg_size:]
-
-    frame=pickle.loads(frame_data)
-    print(frame.size)
-    cv2.imshow('frame', frame)
-    cv2.waitKey(10)
+    file.close()
+    conn.close()
+     
